@@ -47,3 +47,6 @@ po/*~
 
 # RStudio Connect folder
 rsconnect/
+
+# Exclude the 'data' directory
+input/airbnb_data.csv

@@ -1,0 +1,8 @@
+install.packages("readr")
+install.packages("dplyr")
+install.packages("arrow")
+install.packages("stringr")
+install.packages("ggplot2")
+install.packages("naniar")
+install.packages("janitor")
+install.packages("modelsummary")
