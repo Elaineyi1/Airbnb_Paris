@@ -50,3 +50,6 @@ rsconnect/
 
 # Exclude the 'data' directory
 input/airbnb_data.csv
+
+# Exclude the script to install packages for reproducibility
+preparation/install.R
