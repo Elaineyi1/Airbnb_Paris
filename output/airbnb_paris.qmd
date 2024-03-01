@@ -4,6 +4,7 @@ subtitle: "Predicting superhost status based on these factors"
 author: "Boxuan Yi"
 date: "28 Febuary 2024"
 date-format: "D MMMM YYYY"
+thanks: "Code and data in this analysis is available at: https://github.com/Elaineyi1/Airbnb_Paris"
 number-sections: true
 bibliography: references.bib
 format: pdf
