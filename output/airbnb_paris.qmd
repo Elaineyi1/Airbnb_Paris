@@ -12,7 +12,7 @@ format: pdf
 # Introduction
 Paris stands as an iconic destination, renowned for its art, culture, and rich history. This exploratory data analysis (EDA) will use the Airbnb listings in Paris, as at 12 December 2023, to explore the distribution of prices, review scores, and hosts' response times, aiming to forecast whether a host is a superhost based on these factors. The dataset is obtained from Inside Airbnb [@insideairbnbData].
 
-The data will be processed and analyzed in R [@r] using packages readr [@readr], dplyr [@dplyr], arrow [@arrow], stringr [@stringr], ggplot2 [@ggplot2], naniar [@naniar], janitor [@Janitor], modelsummary [@modelsummary], and knitr [@knitr].
+The data will be processed and analyzed in R [@r] using packages readr [@readr], dplyr [@dplyr], arrow [@arrow], stringr [@stringr], ggplot2 [@ggplot2], naniar [@naniar], janitor [@janitor], modelsummary [@modelsummary], and knitr [@knitr].
 
 # Data Analysis
 [@fig-price] (a) illustrates the distribution of nightly prices for Airbnb rentals in Paris in December 2023. The x-axis represents the price, and the y-axis shows the count of properties within each price range. [@fig-price] (b) focus on the airbnb with price exceeding 1000. This graph uses logarithmic scale that helps to visualize and compare higher prices without completely compressing the lower values.
@@ -215,7 +215,7 @@ airbnb_data_has_reviews <-
     host_response_time = factor(host_response_time)
   )
 ```
-
+\newpage
 Out of the 51,978 properties with a review score and complete information about whether the host is a superhost, [@tbl-time], a table of counts for different levels of the response time by hosts, reveals that over 22,000 properties have hosts responding within an hour, while 1,243 properties experience a response time of more than a day. Additionally, there are 16,533 properties with missing response time data. To check whether the absence of response time data is related to review scores, [@fig-score_distribution_NA] shows the distribution of review scores for properties with missing response time. This distribution is actually similar to the distribution of the review scores for all the Airbnb rentals in Paris, with the majority scoring over 4
 ```{r}
 #| message: false
@@ -355,6 +355,7 @@ logistic_reg_superhost_response_review <-
   )
 ```
 
+\newpage
 I construct a model predicting whether someone is a superhost based on response times and review scores, and the summary of the model is presented in [@tbl-model]. Each level of these factors has a positive correlation with the likelihood of being a superhost. Furthermore, having a host that responds within an hour emerges as the most crucial factor contributing to superhost designation in this dataset
 
 ```{r}
