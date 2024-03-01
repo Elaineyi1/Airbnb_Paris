@@ -1,13 +1,22 @@
 ---
-title: "Airbnb in Paris"
+title: "Prices, Response Times and Review Scores for Airbnb in Paris in December 2023"
+subtitle: "Predicting superhost status based on these factors"
 author: "Boxuan Yi"
 date: "28 Febuary 2024"
 date-format: "D MMMM YYYY"
+number-sections: true
+bibliography: references.bib
 format: pdf
 ---
+# Introduction
+Paris stands as an iconic destination, renowned for its art, culture, and rich history. This exploratory data analysis (EDA) will use the Airbnb listings in Paris, as at 12 December 2023, to explore the distribution of prices, review scores, and hosts' response times, aiming to forecast whether a host is a superhost based on these factors. The dataset is obtained from Inside Airbnb [@insideairbnbData].
+
+The data will be processed and analyzed in R [@r] using packages readr [@readr], dplyr [@dplyr], arrow [@arrow], stringr [@stringr], ggplot2 [@ggplot2], naniar [@naniar], janitor [@Janitor], modelsummary [@modelsummary], and knitr [@knitr].
+
+# Data Analysis
+[@fig-price] (a) illustrates the distribution of nightly prices for Airbnb rentals in Paris in December 2023. The x-axis represents the price, and the y-axis shows the count of properties within each price range. [@fig-price] (b) focus on the airbnb with price exceeding 1000. This graph uses logarithmic scale that helps to visualize and compare higher prices without completely compressing the lower values.
 ```{r}
-#| message: false
-#| echo: false
+#| include: false
 library(readr)
 library(dplyr)
 library(arrow)
@@ -20,8 +29,7 @@ library(knitr)
 ```
 
 ```{r}
-#| message: false
-#| echo: false
+#| include: false
 url <-
   paste0(
     "http://data.insideairbnb.com/france/ile-de-france/",
@@ -38,8 +46,8 @@ write_csv(airbnb_data, "airbnb_data.csv")
 ```
 
 ```{r}
-#| message: false
-#| echo: false
+#| include: false
+# Select the variables that will be used
 airbnb_data_selected <-
   airbnb_data |>
   select(
@@ -60,14 +68,11 @@ airbnb_data_selected <-
 write_parquet(
   x = airbnb_data_selected, 
   sink = "2023-12-12-paris-airbnblistings-select_variables.parquet"
-   )
+)
 
 rm(airbnb_data)
-```
 
-```{r}
-#| message: false
-#| echo: false
+# Make each price an integer for further analysis
 airbnb_data_selected <-
   airbnb_data_selected |>
   mutate(
@@ -103,7 +108,7 @@ airbnb_data_selected |>
   ) +
   scale_y_log10()
 ```
-
+Focusing on prices that are less than 1000 dollars, we can see that most properties have a price less than $250 dollars per night from [@fig-price_distribution] (a). The distribution of prices shows some bunching, indicating a tendency for prices to cluster around specific values rather than being uniformly spread across the entire range. For a closer inspection of this bunching phenomenon, [@fig-price_distribution] only shows the distribution of prices between 90 and 210. There are noticeable concentrations of prices, underscoring the non-uniform distribution pattern.
 ```{r}
 #| label: fig-price_distribution
 #| fig-cap: Distribution of prices for Airbnb listings in Paris in December 2023
@@ -152,6 +157,7 @@ airbnb_data_no_superhost_nas <-
   )
 ```
 
+Limiting our focus to properties with complete information on whether the host is a superhost, [@fig-score] visualizes the distribution of review score ratings. Each bar in the graph represents a range of ratings, with the height indicating the number of properties falling within those ranges. The majority of scores are over 4, and many of them receive a perfect score of 5. [@fig-score_distribution] illustrates the distribution of average review scores for Airbnb listings in Paris, excluding properties with missing review scores. Similarly, the majority of scores exceed 4.
 ```{r}
 #| message: false
 #| echo: false
@@ -209,12 +215,13 @@ airbnb_data_has_reviews <-
   )
 ```
 
+Out of the 51,978 properties with a review score and complete information about whether the host is a superhost, [@tbl-time], a table of counts for different levels of the response time by hosts, reveals that over 22,000 properties have hosts responding within an hour, while 1,243 properties experience a response time of more than a day. Additionally, there are 16,533 properties with missing response time data. To check whether the absence of response time data is related to review scores, [@fig-score_distribution_NA] shows the distribution of review scores for properties with missing response time. This distribution is actually similar to the distribution of the review scores for all the Airbnb rentals in Paris, with the majority scoring over 4
 ```{r}
 #| message: false
 #| echo: false
 #| warning: false
 #| label: tbl-time
-#| tbl-cap: Distribution of Hosts Response Time for Paris Airbnb in December 2023
+#| tbl-cap: Distribution of Response Time by Hosts for Paris Airbnb in December 2023
 airbnb_data_has_reviews |>
   count(host_response_time) |> kable()
 ```
@@ -224,7 +231,7 @@ airbnb_data_has_reviews |>
 #| echo: false
 #| warning: false
 #| label: fig-score_distribution_NA
-#| fig-cap: Distribution of review scores for properties with NA response time, for Paris Airbnb rentals in December 2023
+#| fig-cap: Distribution of review scores for properties with missing response time, for Paris Airbnb rentals in December 2023
 airbnb_data_has_reviews |>
   filter(is.na(host_response_time)) |>
   ggplot(aes(x = review_scores_rating)) +
@@ -235,7 +242,7 @@ airbnb_data_has_reviews |>
     y = "Number of properties"
   )
 ```
-
+[@fig-missing_value] depicts the association between hosts' response time and the accuracy of review scores, distinguished by the status of missing (in red) or non-missing (in blue). Notably, the accuracy of review scores for missing values appears significantly lower comparing to the accuracy for non-missing values.
 ```{r}
 #| message: false
 #| echo: false
@@ -255,7 +262,7 @@ airbnb_data_has_reviews |>
   ) +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
 ```
-
+For now, anyone with missing values in their response time will be excluded. Based on [@fig-properties], we can see there is a large number of hosts owning 1 to 10 properties, and the majority of hosts have only one property, with an expected long tail in the distribution.
 ```{r}
 #| message: false
 #| echo: false
@@ -285,6 +292,7 @@ airbnb_data_selected <-
   select(-n)
 ```
 
+The relationship between price, review scores, and superhost status, for properties with more than one review, is shown in [@fig-relationship], with red representing the host is not a superhost, blue representing the superhost. There are a lot more non-superhosts than superhosts, and superhosts have a higher average review, regardless of property prices per night, than hosts that are not superhosts. Interestingly, [@fig-relationship] shows the prices of properties without a superhost predominantly cluster under $250, while properties with a superhost display a more evenly distributed price range.
 ```{r}
 #| message: false
 #| echo: false
@@ -346,6 +354,8 @@ logistic_reg_superhost_response_review <-
   )
 ```
 
+I construct a model predicting whether someone is a superhost based on response times and review scores, and the summary of the model is presented in [@tbl-model]. Each level of these factors has a positive correlation with the likelihood of being a superhost. Furthermore, having a host that responds within an hour emerges as the most crucial factor contributing to superhost designation in this dataset
+
 ```{r}
 #| message: false
 #| echo: false
@@ -359,6 +369,9 @@ modelsummary(logistic_reg_superhost_response_review)
 #| include: false
 write_parquet(
   x = airbnb_data_selected, 
-  sink = "2023-05-05-london-airbnblistings-analysis_dataset.parquet"
+  sink = "2023-12-12-paris-airbnblistings-analysis_dataset.parquet"
   )
 ```
+
+\newpage
+# References
