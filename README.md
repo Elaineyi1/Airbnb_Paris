@@ -4,7 +4,8 @@ This repo contains an exploratory data analysis for the Airbnb listings in Paris
 
 The dataset was added in the “.gitignore” file and hence not pushed to this repo. 
 
-The analysis can be found in `output`
+The analysis paper, the code that finish the paper, the model and the references can be found in `output`.
+The download and cleaning processes can be found in `scripts`.
 
 ## LLMs Usage
 No LLM was used.
